@@ -144,7 +144,7 @@ body {
     transform: translateX(-100%);
     border-radius: 0 50px 30px 0; /* Reduced the radius */
   }
-  
+
 .toggle {
   background-color: #1916df ;
   height: 100%;
@@ -158,6 +158,7 @@ body {
 }
 .container.active .toggle {
   transform: translateX(50%);
+  
 }
 .toggle-panel {
   position: absolute;

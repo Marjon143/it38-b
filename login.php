@@ -42,7 +42,7 @@
                     <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
                 </div>
                 <hr>
-                <h1>OR</h1>
+                <h1>or</h1>
                 <hr>
                 <span>Login With Your Email & Password</span>
                 <input type="email" placeholder="Email" required>
