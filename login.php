@@ -28,6 +28,7 @@
                 <input type="text" placeholder="Name" required>
                 <input type="email" placeholder="Email" required>
                 <input type="password" placeholder="Password" required>
+                <input type="confirm password" placeholder="Confirm Password" required>
                 <button>Sign Up</button>
             </form>
         </div>
