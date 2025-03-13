@@ -6,8 +6,8 @@
   font-family: "Montserrat", sans-serif;
 }
 body {
-  background-color: #004754;
-  background: linear-gradient(to right, #004754, #bebd00);
+  background-color: #f4f8f8;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,7 @@ body {
   margin: 20px 0;
 }
 .fa-brands {
-  color: #004754;
+  color: #1916df;
 }
 .container span {
   font-size: 12px;
@@ -43,7 +43,7 @@ body {
   margin: 15px 0 10px;
 }
 .container button {
-  background-color: #bebd00;
+  background-color: #1916df;
   color: #ffffff;
   font-size: 12px;
   padding: 10px 45px;
@@ -145,9 +145,9 @@ body {
   border-radius: 0 150px 100px 0;
 }
 .toggle {
-  background-color: #004754;
+  background-color: #1916df ;
   height: 100%;
-  background: linear-gradient(to right, #004754, #004754);
+
   color: #ffffff;
   position: relative;
   left: -100%;
