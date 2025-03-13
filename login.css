@@ -141,13 +141,13 @@ body {
   z-index: 1000;
 }
 .container.active .toggle-container {
-  transform: translateX(-100%);
-  border-radius: 0 150px 100px 0;
-}
+    transform: translateX(-100%);
+    border-radius: 0 50px 30px 0; /* Reduced the radius */
+  }
+  
 .toggle {
   background-color: #1916df ;
   height: 100%;
-
   color: #ffffff;
   position: relative;
   left: -100%;
