@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/dashboard.css">
+    <link rel="stylesheet" href="assets/booking.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <title>Booking Page</title>
 </head>
@@ -36,14 +36,15 @@
                     </div>
                     <div class="card-body">
                         <form action="#" method="post" class="booking-form">
-                            <div class="form-group">
-                                <label for="rider">Select Rider</label>
-                                <select name="rider" id="rider" class="dropdown">
-                                    <option value="rider1">Rider 1</option>
-                                    <option value="rider2">Rider 2</option>
-                                    <option value="rider3">Rider 3</option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+    <label for="rider">Select Rider</label>
+    <select name="rider" id="rider" class="dropdown">
+        <option value="rider1" data-status="available">Rider 1 - <span class="status available">Available</span></option>
+        <option value="rider2" data-status="not-available">Rider 2 - <span class="status not-available">Not Available</span></option>
+        <option value="rider3" data-status="available">Rider 3 - <span class="status available">Available</span></option>
+    </select>
+</div>
+
 
                             <div class="form-group">
                                 <label for="vehicle">Select Vehicle Type</label>
@@ -88,6 +89,6 @@
         </div>
     </section>
 
-    <script src="assets/dashboard.js"></script>
+    <script src="assets/booking.js"></script>
 </body>
 </html>
