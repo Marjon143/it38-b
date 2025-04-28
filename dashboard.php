@@ -51,7 +51,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="booking.php">
                         <span class="icon icon-3"><i class="ri-user-2-line"></i></span>
                         <span class="sidebar--item" style="white-space: nowrap;">Bookings</span>
                     </a>

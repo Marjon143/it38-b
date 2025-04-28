@@ -18,9 +18,9 @@
             <ul class="sidebar--items">
                 <!-- Your existing sidebar items -->
                 <li>
-                    <a href="booking.html">
+                    <a href="dashboard.php">
                         <span class="icon icon-3"><i class="ri-bookmark-line"></i></span>
-                        <span class="sidebar--item">Booking</span>
+                        <span class="sidebar--item">Go Back</span>
                     </a>
                 </li>
                 <!-- Other sidebar items -->
