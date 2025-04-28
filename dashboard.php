@@ -45,7 +45,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="customer.php">
                         <span class="icon icon-2"><i class="ri-calendar-2-line"></i></span>
                         <span class="sidebar--item">Customers</span>
                     </a>
