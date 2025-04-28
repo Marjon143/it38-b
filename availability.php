@@ -24,10 +24,9 @@
                     <h2 class="section--title">Riders Availability</h2>
                     <select name="date" id="date" class="dropdown">
                         <option value="today">Today</option>
-                        <option value="lastweek">Last Week</option>
-                        <option value="lastmonth">Last Month</option>
-                        <option value="lastyear">Last Year</option>
-                        <option value="alltime">All Time</option>
+                        <option value="tomorrow">Last Week</option>
+                        <option value="custom">Last Month</option>
+                       
                     </select>
                 </div>
                 <div class="table-wrapper">
