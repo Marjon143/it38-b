@@ -12,7 +12,7 @@
     <section class="header">
         <div class="logo">
             <i class="ri-menu-line icon icon-0 menu"></i>
-            <h2>Med<span>Ex</span></h2>
+            <h2>E<span>CARGA</span></h2>
         </div>
         <div class="search--notification--profile">
             <div class="search">
@@ -57,7 +57,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="availability.php">
                         <span class="icon icon-4"><i class="ri-user-line"></i></span>
                         <span class="sidebar--item">Availability</span>
                     </a>
