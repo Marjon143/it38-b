@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
                 $_SESSION['user_name'] = $user['name'];
 
                 // Redirect to dashboard after successful login
-                header("Location: dashboard.php");
+                header("Location: customer_landing.php");
                 exit(); // Ensure no further code is executed
             } else {
                 echo "<p>Incorrect password. Please try again.</p>";
