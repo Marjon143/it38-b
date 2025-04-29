@@ -1,214 +1,183 @@
 <?php
-// Database connection settings
-$host = "localhost"; // your DB host
-$dbname = "ecarga"; // your DB name
-$username = "root"; // your DB username
-$password = ""; // your DB password
+// Step 1: Database connection
+$host = 'localhost';         // Change to your database host
+$db = 'ecarga';  // Your database name
+$user = 'root';     // Your database username
+$pass = '';     // Your database password
+$charset = 'utf8mb4';
 
-// Connect to the database
+// Set up the database connection
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-    die();
+    // Establish the PDO connection
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 
-// Fetch customers from the database
-$sql = "SELECT name, avatar_url FROM users"; // Adjust your query to match your table structure
-$stmt = $pdo->prepare($sql);
-$stmt->execute();
-$customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Step 2: Fetch user data from the database
+$sql = "SELECT user_id, name, email, avatar_url FROM users";
+$stmt = $pdo->query($sql);
+$users = $stmt->fetchAll();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Customers - MedEx</title>
-    <link rel="stylesheet" href="assets/dashboard.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Page</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f8;
+            font-family: Arial, sans-serif;
+            display: flex;
             margin: 0;
-            color: #333;
+            padding: 0;
         }
 
-        .main {
-            display: flex;
-            min-height: 100vh;
+        /* Sidebar styles */
+        #sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
         }
 
-        .main--content {
-            flex: 1;
-            padding: 2rem;
+        #sidebar h2 {
+            text-align: center;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+        #sidebar ul {
+            list-style-type: none;
+            padding-left: 0;
         }
 
-        .card {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        #sidebar ul li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #34495e;
+            cursor: pointer;
         }
 
-        .section--title {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
+        #sidebar ul li:hover {
+            background-color: #1abc9c;
+        }
+
+        /* Main content area */
+        #main-content {
+            margin-left: 270px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        h1 {
             color: #2c3e50;
         }
 
-        .customer--list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .customer--card {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 1.5rem;
-            width: 240px;
-            text-align: center;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
+        table, th, td {
+            border: 1px solid #ddd;
         }
 
-        .customer--card:hover {
-            transform: translateY(-5px);
+        th, td {
+            padding: 12px;
+            text-align: left;
         }
 
-        .customer--image {
-            width: 90px;
-            height: 90px;
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        td img {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin-bottom: 1rem;
-            object-fit: cover;
-            border: 3px solid #0077cc;
         }
 
-        .customer--card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: #0077cc;
-        }
-
-        .customer--actions button {
-            background-color: #0077cc;
+        .action-btn {
+            padding: 6px 12px;
+            margin: 2px;
+            background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            margin: 0.3rem;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .customer--actions button:hover {
-            background-color: #005fa3;
-            transform: scale(1.05);
-        }
-
-        .customer--history h3 {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
-
-        .customer--history ul {
-            list-style: none;
-            padding-left: 1rem;
-        }
-
-        .customer--history li {
-            margin-bottom: 0.6rem;
-            position: relative;
-            padding-left: 1.2rem;
-            line-height: 1.5;
-        }
-
-        .customer--history li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: #0077cc;
-            font-size: 1.2rem;
-        }
-
-        @media (max-width: 768px) {
-            .customer--list {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .customer--card {
-                width: 90%;
-            }
+        .action-btn:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
 <body>
-    <section class="header">
-        <!-- Include header markup here -->
-    </section>
 
-    <section class="main">
-        <div class="sidebar">
-            <!-- Include sidebar markup here -->
-        </div>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h2>Customer Dashboard</h2>
+        <ul>
+            <li onclick="showCustomerInfo()">Customer Info</li>
+            <li onclick="showTransactionHistory()">Logout</li>
+        </ul>
+    </div>
 
-        <div class="main--content">
-            <div class="container">
-                <div class="title">
-                    <h2 class="section--title">Customers</h2>
-                </div>
+    <!-- Main content area -->
+    <div id="main-content">
+        <h1>Customer List</h1>
+        
+        <!-- Table to show customer info -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="customerTable">
+                <!-- Dynamic content will be inserted here from PHP -->
+                <?php
+                // Step 3: Loop through the user data and display it in the table
+                foreach ($users as $user) {
+                    echo "
+                        <tr>
+                            <td><img src='{$user['avatar_url']}' alt='{$user['name']} Avatar'></td>
+                            <td>{$user['name']}</td>
+                            <td>
+                                <button class='action-btn' onclick='viewCustomerInfo({$user['user_id']})'>View Info</button>
+                                <button class='action-btn' onclick='viewTransactionHistory({$user['user_id']})'>Transaction History</button>
+                            </td>
+                        </tr>
+                    ";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
 
-                <div class="customer--list card">
-                    <?php
-                    // Loop through the fetched customers and display their data in cards
-                    foreach ($customers as $customer) {
-                        $avatarUrl = !empty($customer['avatar_url']) ? $customer['avatar_url'] : 'https://via.placeholder.com/80'; // Default to placeholder if no avatar URL
-                        echo "
-                            <div class='customer--card'>
-                                <img src='$avatarUrl' alt='{$customer['name']}' class='customer--image'>
-                                <h3>{$customer['name']}</h3>
-                                <div class='customer--actions'>
-                                    <button>Customer Info</button>
-                                    <button>History</button>
-                                </div>
-                            </div>
-                        ";
-                    }
-                    ?>
-                </div>
+    <script>
+        // Placeholder for action functions
+        function viewCustomerInfo(userId) {
+            alert("Viewing info for user ID: " + userId);
+            // You can add logic to navigate or show more details
+        }
 
-                <div class="customer--history card">
-                    <h3>Recent Customer History</h3>
-                    <ul>
-                        <li>John Doe requested a ride on 2025-04-22 at 4:30 PM</li>
-                        <li>Jane Smith cancelled a booking on 2025-04-20</li>
-                        <li>David Park gave a rating of 5 stars on 2025-04-19</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+        function viewTransactionHistory(userId) {
+            alert("Viewing transaction history for user ID: " + userId);
+            // You can add logic to navigate to a transaction history page or show a modal
+        }
+    </script>
 
-    <script src="assets/dashboard.js"></script>
 </body>
 </html>

@@ -1,12 +1,14 @@
 <?php
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Database connection settings
-    $host = "localhost"; // your DB host
-    $dbname = "ecarga"; // your DB name
-    $username = "root"; // your DB username
-    $password = ""; // your DB password
+session_start(); // Start session to store user data
 
+// Database connection settings
+$host = "localhost"; // your DB host
+$dbname = "ecarga"; // your DB name
+$username = "root"; // your DB username
+$password = ""; // your DB password
+
+// Handle registration form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     try {
         // Connect to the database
         $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -15,17 +17,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Collect form data
         $name = $_POST['name'];
         $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash the password
-        $address = $_POST['address'];
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
 
-        // Collect avatar URL
-        $avatar_url = $_POST['avatar_url'];
+        // Check if the passwords match
+        if ($password !== $confirm_password) {
+            echo "<p>Passwords do not match. Please try again.</p>";
+        } else {
+            // Hash the password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $address = $_POST['address'];
 
-        // Insert user data into the database
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, address, avatar_url) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $email, $password, $address, $avatar_url]);
+            // Handle avatar image upload
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['avatar']['tmp_name'];
+                $fileName = $_FILES['avatar']['name'];
+                $uploadPath = 'uploads/' . basename($fileName);
 
-        echo "<p>User registered successfully!</p>";
+                // Ensure the "uploads" folder exists and is writable
+                if (!is_dir('uploads')) {
+                    mkdir('uploads', 0777, true);
+                }
+
+                // Move the uploaded file to the server
+                if (move_uploaded_file($fileTmpPath, $uploadPath)) {
+                    // Insert user data into the database
+                    $stmt = $pdo->prepare("INSERT INTO users (name, email, password, address, avatar_url) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$name, $email, $hashed_password, $address, $uploadPath]);
+
+                    echo "<p>User registered successfully!</p>";
+                } else {
+                    echo "<p>Error uploading file.</p>";
+                }
+            } else {
+                echo "<p>No avatar image uploaded.</p>";
+            }
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+// Handle login form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+    try {
+        // Connect to the database
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Collect login form data
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        // Check if the email exists
+        $stmt = $pdo->prepare("SELECT user_id, name, password FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        
+        // If email exists, verify the password
+        if ($stmt->rowCount() > 0) {
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (password_verify($password, $user['password'])) {
+                // Store user info in session
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['user_name'] = $user['name'];
+
+                // Redirect to dashboard after successful login
+                header("Location: dashboard.php");
+                exit(); // Ensure no further code is executed
+            } else {
+                echo "<p>Incorrect password. Please try again.</p>";
+            }
+        } else {
+            echo "<p>Email not found. Please register first.</p>";
+        }
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -41,32 +105,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://kit.fontawesome.com/2efc16a506.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="assets/login.css">
-    <title>Registration Form | pbc-webdev</title>
+    <title>Login Form | pbc-webdev</title>
 </head>
 
 <body>
     <div class="container" id="container">
+        <!-- Registration Form -->
         <div class="form-container sign-up">
-            <form action="" method="POST">
-                <span>Fill in the information fields.</span>
+            <form action="" method="POST" enctype="multipart/form-data">
+                <hr>
+                <h1>or</h1>
+                <hr>
+                <span>Fill the information field.</span>
                 <input type="text" name="name" placeholder="Name" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Password" required>
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-
+                
                 <!-- Address Input -->
                 <input type="text" name="address" placeholder="Address" required>
 
-                <!-- Avatar Image URL Input -->
-                <input type="text" name="avatar_url" placeholder="Avatar URL" required>
-
-                <button type="submit">Sign Up</button>
+                <!-- Avatar Image Upload -->
+                <input type="file" name="avatar" accept="image/*" placeholder="Avatar" required>
+                
+                <button type="submit" name="register">Sign Up</button>
             </form>
         </div>
 
-        <!-- Sign-in Form -->
+        <!-- Login Form -->
         <div class="form-container sign-in">
-            <form>
+            <form action="" method="POST">
                 <h1>Login With</h1>
                 <div class="social-icons">
                     <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
@@ -78,9 +146,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h1>or</h1>
                 <hr>
                 <span>Login With Your Email & Password</span>
-                <input type="email" placeholder="Email" required>
-                <input type="password" placeholder="Password" required>
-                <button>Login</button>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" name="login">Login</button>
             </form>
         </div>
 
