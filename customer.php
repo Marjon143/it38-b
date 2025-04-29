@@ -1,3 +1,25 @@
+<?php
+// Database connection settings
+$host = "localhost"; // your DB host
+$dbname = "ecarga"; // your DB name
+$username = "root"; // your DB username
+$password = ""; // your DB password
+
+// Connect to the database
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "Connection failed: " . $e->getMessage();
+    die();
+}
+
+// Fetch customers from the database
+$sql = "SELECT name, avatar_url FROM users"; // Adjust your query to match your table structure
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,32 +179,22 @@
                 </div>
 
                 <div class="customer--list card">
-                    <div class="customer--card">
-                        <img src="https://via.placeholder.com/80" alt="John Doe" class="customer--image">
-                        <h3>John Doe</h3>
-                        <div class="customer--actions">
-                            <button>Customer Info</button>
-                            <button>History</button>
-                        </div>
-                    </div>
-
-                    <div class="customer--card">
-                        <img src="https://via.placeholder.com/80" alt="Jane Smith" class="customer--image">
-                        <h3>Jane Smith</h3>
-                        <div class="customer--actions">
-                            <button>Customer Info</button>
-                            <button>History</button>
-                        </div>
-                    </div>
-
-                    <div class="customer--card">
-                        <img src="https://via.placeholder.com/80" alt="David Park" class="customer--image">
-                        <h3>David Park</h3>
-                        <div class="customer--actions">
-                            <button>Customer Info</button>
-                            <button>History</button>
-                        </div>
-                    </div>
+                    <?php
+                    // Loop through the fetched customers and display their data in cards
+                    foreach ($customers as $customer) {
+                        $avatarUrl = !empty($customer['avatar_url']) ? $customer['avatar_url'] : 'https://via.placeholder.com/80'; // Default to placeholder if no avatar URL
+                        echo "
+                            <div class='customer--card'>
+                                <img src='$avatarUrl' alt='{$customer['name']}' class='customer--image'>
+                                <h3>{$customer['name']}</h3>
+                                <div class='customer--actions'>
+                                    <button>Customer Info</button>
+                                    <button>History</button>
+                                </div>
+                            </div>
+                        ";
+                    }
+                    ?>
                 </div>
 
                 <div class="customer--history card">
