@@ -21,9 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $plate_number = $_POST['plateNumber'];
     $years_experience = $_POST['yearsExperience'];
     $image_url = $_POST['driverImageURL'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    $stmt = $conn->prepare("INSERT INTO drivers (name, address, vehicle_type, plate_number, years_experience, image_url) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssis", $name, $address, $vehicle_type, $plate_number, $years_experience, $image_url);
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    $stmt = $conn->prepare("INSERT INTO drivers (name, address, vehicle_type, plate_number, years_experience, image_url, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $name, $address, $vehicle_type, $plate_number, $years_experience, $image_url, $email, $hashed_password);
+
     if ($stmt->execute()) {
         header("Location: crud.php");
         exit;
@@ -61,117 +66,138 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            background: #f5f5f5;
         }
+
         .container {
-            width: 80%;
-            margin: 30px auto;
+            max-width: 1200px;
+            margin: auto;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
         }
-        h2, h1 {
+
+        h2 {
             text-align: center;
-            color: #333;
-        }
-        .form-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
             margin-bottom: 20px;
         }
-        .form-container input, .form-container select {
-            width: calc(33.33% - 15px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
+
+        .form-container form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-container input,
+        .form-container select,
         .form-container button {
-            width: 100%;
             padding: 10px;
-            background-color: #4CAF50;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-container button {
+            grid-column: span 2;
+            background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
+
         .form-container button:hover {
-            background-color: #45a049;
+            background-color: #218838;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
         }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
+
         th, td {
-            padding: 10px;
-            text-align: center;
+            padding: 15px;
+            text-align: left;
         }
-        th {
-            background-color: #4CAF50;
+
+        thead {
+            background-color: #343a40;
             color: white;
         }
-        .action-buttons button, .action-buttons a {
-            padding: 5px 10px;
-            margin: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            border: none;
-            text-decoration: none;
-            display: inline-block;
+
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
-        .view-btn {
-            background-color: #2196F3;
-            color: white;
-        }
-        .update-btn {
-            background-color: #ff9800;
-            color: white;
-        }
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-        }
+
         .image-preview {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
+            border-radius: 50%;
         }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons a,
+        .action-buttons button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .view-btn {
+            background-color: #17a2b8;
+        }
+
+        .update-btn {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
         #deleteModal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
         }
+
         .modal-content {
-            background-color: #fff;
+            background: white;
             padding: 20px;
-            border-radius: 5px;
-            width: 300px;
+            border-radius: 8px;
             text-align: center;
         }
+
         .modal-content button {
-            padding: 10px 15px;
-            border: none;
-            background-color: #f44336;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .modal-content button:hover {
-            background-color: #e53935;
+            margin: 10px;
+            padding: 10px 20px;
         }
     </style>
     <script>
@@ -188,7 +214,6 @@ $result = $conn->query($sql);
 <div class="container">
     <h2>Driver CRUD Operations</h2>
 
-    <!-- Add Driver Form -->
     <div class="form-container">
         <form action="crud.php" method="POST">
             <input type="text" name="driverName" placeholder="Driver Name" required>
@@ -202,12 +227,13 @@ $result = $conn->query($sql);
             <input type="text" name="plateNumber" placeholder="Plate Number" required>
             <input type="number" name="yearsExperience" placeholder="Years of Experience" required>
             <input type="url" name="driverImageURL" placeholder="Image URL" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="email" name="email" placeholder="Email" required>
             <input type="hidden" name="action" value="add">
             <button type="submit">Add Driver</button>
         </form>
     </div>
 
-    <!-- Driver List Table -->
     <h1>Drivers List</h1>
     <table>
         <thead>
@@ -218,6 +244,7 @@ $result = $conn->query($sql);
             <th>Vehicle Type</th>
             <th>Plate Number</th>
             <th>Years of Experience</th>
+            <th>Email</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -231,6 +258,7 @@ $result = $conn->query($sql);
                     <td><?= htmlspecialchars($row['vehicle_type']) ?></td>
                     <td><?= htmlspecialchars($row['plate_number']) ?></td>
                     <td><?= htmlspecialchars($row['years_experience']) ?></td>
+                    <td><?= htmlspecialchars($row['email']) ?></td>
                     <td class="action-buttons">
                         <a href="view.php?id=<?= $row['driver_id'] ?>" class="view-btn">View</a>
                         <a href="edit.php?id=<?= $row['driver_id'] ?>" class="update-btn">Edit</a>
@@ -239,13 +267,12 @@ $result = $conn->query($sql);
                 </tr>
             <?php endwhile; ?>
         <?php else: ?>
-            <tr><td colspan="7">No drivers found.</td></tr>
+            <tr><td colspan="8">No drivers found.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal">
     <div class="modal-content">
         <p>Are you sure you want to delete this driver?</p>
@@ -257,6 +284,4 @@ $result = $conn->query($sql);
 </body>
 </html>
 
-<?php
-$conn->close();
-?>
+<?php $conn->close(); ?>

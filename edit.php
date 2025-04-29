@@ -1,8 +1,8 @@
 <?php
 // Database connection
-$servername = "localhost";  
-$username = "root";         
-$password = "";             
+$servername = "localhost";
+$username = "root";
+$password = "";
 $dbname = "ecarga";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -35,14 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $driver_id = $_POST['id'];
     $name = $_POST['driverName'];
     $address = $_POST['address'];
+    $email = $_POST['email'];
     $vehicleType = $_POST['vehicleType'];
     $plateNumber = $_POST['plateNumber'];
     $yearsExperience = $_POST['yearsExperience'];
     $imageURL = $_POST['driverImageURL'];
 
-    $sql = "UPDATE drivers SET name = ?, address = ?, vehicle_type = ?, plate_number = ?, years_experience = ?, image_url = ? WHERE driver_id = ?";
+    $sql = "UPDATE drivers SET name = ?, address = ?, email = ?, vehicle_type = ?, plate_number = ?, years_experience = ?, image_url = ? WHERE driver_id = ?";
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("ssssssi", $name, $address, $vehicleType, $plateNumber, $yearsExperience, $imageURL, $driver_id);
+        $stmt->bind_param("sssssssi", $name, $address, $email, $vehicleType, $plateNumber, $yearsExperience, $imageURL, $driver_id);
         if ($stmt->execute()) {
             echo "<p style='color: green; text-align: center;'>Driver details updated successfully.</p>";
         } else {
@@ -88,6 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
 
         <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($driver['email']); ?>" required>
+        </div>
+
+        <div class="form-group">
             <label for="vehicleType">Vehicle Type</label>
             <select name="vehicleType" required>
                 <option value="Bao-Bao" <?php echo $driver['vehicle_type'] == 'Bao-Bao' ? 'selected' : ''; ?>>Car</option>
@@ -113,10 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="id" value="<?php echo htmlspecialchars($driver['driver_id']); ?>">
-        <a href="crud.php">
-  <button type="submit">Update Driver</button>
-</a>
-
+        <button type="submit">Update Driver</button>
     </form>
     <?php else: ?>
         <p style="color: red; text-align: center;">Driver not found.</p>

@@ -58,9 +58,13 @@ $conn->close();
             <div class="avatar">
                 <!-- Display the avatar dynamically using PHP -->
                 <img src="<?php echo $avatar_image_url; ?>" alt="Avatar" class="avatar-img">
-                <div class="avatar-dropdown">
-                    <a href="#">Logout</a>
-                </div>
+            </div>
+            <!-- Display the user's name beside the avatar -->
+            <div class="user-name">
+                <p>Hello, <?php echo htmlspecialchars($user_name); ?>!</p>
+            </div>
+            <div class="avatar-dropdown">
+                <a href="#">Logout</a>
             </div>
         </div>
 
