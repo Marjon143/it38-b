@@ -113,7 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="id" value="<?php echo htmlspecialchars($driver['driver_id']); ?>">
-        <button type="submit">Update Driver</button>
+        <a href="crud.php">
+  <button type="submit">Update Driver</button>
+</a>
+
     </form>
     <?php else: ?>
         <p style="color: red; text-align: center;">Driver not found.</p>
