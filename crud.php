@@ -195,8 +195,8 @@ $result = $conn->query($sql);
             <input type="text" name="address" placeholder="Address" required>
             <select name="vehicleType" required>
                 <option value="" disabled selected>Select Vehicle Type</option>
-                <option value="Car">Car</option>
-                <option value="Jeep">Truck</option>
+                <option value="Car">Jeep</option>
+                <option value="Jeep">Bao-Bao</option>
                 <option value="Motorcycle">Motorcycle</option>
             </select>
             <input type="text" name="plateNumber" placeholder="Plate Number" required>

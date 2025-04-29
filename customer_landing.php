@@ -1,85 +1,161 @@
+<?php
+// Start the session
+session_start();
+
+// Database connection
+$servername = "localhost";
+$username = "root"; // Your DB username
+$password = ""; // Your DB password
+$dbname = "ecarga"; // Your DB name
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check if the connection is successful
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Simulate user login: Assume user ID is stored in session (you should set this after user authentication)
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1; // Example: logged-in user with ID 1
+}
+
+// Fetch user data from the database (including avatar image URL)
+$user_id = $_SESSION['user_id'];
+$sql = "SELECT name, avatar_url FROM users WHERE user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$stmt->bind_result($user_name, $avatar_image_url);
+$stmt->fetch();
+
+// If no avatar is found, use a default image
+if (empty($avatar_image_url)) {
+    $avatar_image_url = 'images/default-avatar.png'; // Default avatar
+}
+
+$stmt->close();
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Driver</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .booking-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Driver Information</title>
+    <link rel="stylesheet" href="assets/customer_landing.css">
 </head>
 <body>
 
-    <div class="booking-container">
-        <h1>Book Your Driver</h1>
-        <form id="bookingForm">
-            <input type="text" id="name" placeholder="Your Name" required>
-            <input type="text" id="pickup" placeholder="Pickup Location" required>
-            <input type="text" id="dropoff" placeholder="Drop-off Location" required>
-            <input type="date" id="date" required>
-            <input type="time" id="time" required>
-            <button type="submit">Book Now</button>
-        </form>
-        <div id="confirmationMessage" style="display:none; margin-top: 20px; font-size: 18px; color: green;"></div>
+<div class="container">
+    <h1>ECARGA: SAFE RIDE MADE POSSIBLE</h1>
+
+    <!-- Header with Avatar and Search Field -->
+    <div class="header">
+        <!-- Avatar with dropdown -->
+        <div class="avatar-container">
+            <div class="avatar">
+                <!-- Display the avatar dynamically using PHP -->
+                <img src="<?php echo $avatar_image_url; ?>" alt="Avatar" class="avatar-img">
+                <div class="avatar-dropdown">
+                    <a href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Field -->
+        <input type="text" class="search-field" placeholder="Search Drivers...">
     </div>
 
-    <script>
-        document.getElementById('bookingForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const pickup = document.getElementById('pickup').value;
-            const dropoff = document.getElementById('dropoff').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            
-            if(name && pickup && dropoff && date && time) {
-                document.getElementById('confirmationMessage').style.display = 'block';
-                document.getElementById('confirmationMessage').innerText = `Thank you, ${name}! Your driver has been booked from ${pickup} to ${dropoff} on ${date} at ${time}.`;
-                
-                // Reset the form after submission
-                document.getElementById('bookingForm').reset();
-            } else {
-                alert('Please fill out all fields.');
-            }
-        });
-    </script>
+    <!-- Available Drivers Section -->
+    <div class="section driver-status">
+        <h2>Available Drivers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Driver Name</th>
+                    <th>Vehicle Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="available">
+                    <td>John Doe</td>
+                    <td>Sedan</td>
+                    <td class="action-buttons">
+                        <button onclick="alert('Booking John Doe');">Book Now</button>
+                        <button class="view" onclick="alert('Viewing profile of John Doe');">View Driver</button>
+                        <button class="contact" onclick="alert('Contacting John Doe');">Contact Driver</button>
+                    </td>
+                </tr>
+                <tr class="available">
+                    <td>Jane Smith</td>
+                    <td>SUV</td>
+                    <td class="action-buttons">
+                        <button onclick="alert('Booking Jane Smith');">Book Now</button>
+                        <button class="view" onclick="alert('Viewing profile of Jane Smith');">View Driver</button>
+                        <button class="contact" onclick="alert('Contacting Jane Smith');">Contact Driver</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Busy Drivers Section -->
+    <div class="section driver-status">
+        <h2>Busy Drivers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Driver Name</th>
+                    <th>Vehicle Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="busy">
+                    <td>Emily White</td>
+                    <td>Sedan</td>
+                </tr>
+                <tr class="busy">
+                    <td>Michael Johnson</td>
+                    <td>SUV</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vehicles Section -->
+    <div class="section vehicle-list">
+        <h2>Available Vehicles</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Vehicle Type</th>
+                    <th>Capacity</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sedan</td>
+                    <td>Up to 4 passengers</td>
+                    <td>Comfortable and compact for city driving</td>
+                </tr>
+                <tr>
+                    <td>SUV</td>
+                    <td>Up to 6 passengers</td>
+                    <td>Great for families or small groups</td>
+                </tr>
+                <tr>
+                    <td>Minivan</td>
+                    <td>Up to 8 passengers</td>
+                    <td>Spacious for larger groups or luggage</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 </body>
 </html>
